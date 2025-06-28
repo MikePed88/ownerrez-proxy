@@ -59,7 +59,10 @@ let lastBookingsFetchTime = null;
 const fetchAndCacheBookings = async () => {
   try {
     const response = await axios.get('https://api.ownerrez.com/v2/bookings', {
-      auth: { username, password }
+      auth: { username, password },
+      params: {
+        property_ids: 415394
+      }
     });
     cachedBookings = response.data;
     lastBookingsFetchTime = Date.now();
