@@ -1,33 +1,30 @@
 const express = require('express');
-const axios = require('axios');
+const cors = require('cors');
+const fetch = require('node-fetch'); // If you're calling external APIs
+
 const app = express();
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 
-// Use environment variables for credentials
-const username = process.env.USERNAME;
-const password = process.env.PASSWORD;
-
-if (!username || !password) {
-  console.error('USERNAME and PASSWORD must be set as environment variables.');
-  process.exit(1);
-}
+// Enable CORS for all routes
+app.use(cors());
+app.use(express.json());
 
 app.get('/properties', async (req, res) => {
   try {
-    const response = await axios.get(
-      'https://api.ownerrez.com/v2/properties',
-      {
-        headers: { 'Content-Type': 'application/json' },
-        auth: { username, password },
-      },
-    );
-    res.json(response.data);
+    // Example: Replace this with your real OwnerRez API logic
+    const response = await fetch('https://api.ownerrez.com/v1/properties', {
+      headers: {
+        'Authorization': `Bearer ${process.env.OWNERREZ_API_KEY}`
+      }
+    });
+    const data = await response.json();
+    res.json(data);
   } catch (error) {
-    console.error('OwnerRez API error:', error.response?.data || error.message);
-    res.status(error.response?.status || 500).json({ error: error.message });
+    console.error('Error fetching properties:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-app.listen(port, () => {
-  console.log(`🚀 Server is running on port ${port}`);
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
