@@ -14,6 +14,11 @@ if (!username || !password) {
   process.exit(1);
 }
 
+app.use((req, res, next) => {
+  console.log(`Incoming request: ${req.method} ${req.url}`);
+  next();
+});
+
 // 🔐 Allow all origins by default (you can customize later)
 app.use(cors());
 
