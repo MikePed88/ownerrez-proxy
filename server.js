@@ -90,7 +90,7 @@ app.listen(port, () => {
   console.log(`🚀 Server running on port ${port}`);
 });
 
-// Cached Bookings endpoint
+// Cached Guests endpoint
 let cachedGuests = null;
 let lastGuestsFetchTime = null;
 
@@ -98,8 +98,11 @@ const fetchAndCacheGuests = async () => {
   try {
     const response = await axios.get('https://api.ownerrez.com/v2/guests', {
       auth: { username, password },
-      
+      params: {
+        created_since_utc: '2022-01-01T00:00:00Z'
+      }      
     });
+    
     cachedGuests = response.data;
     lastGuestsFetchTime = Date.now();
     console.log('🔄 Guests cache refreshed');
