@@ -111,9 +111,24 @@ const fetchAndCacheGuests = async () => {
 fetchAndCacheGuests();
 setInterval(fetchAndCacheGuests, CACHE_DURATION_MS);
 
-app.get('/cached-guests', (req, res) => {
+// GET /cached-guests or /cached-guests/:id
+app.get('/cached-guests/:id?', (req, res) => {
   if (!cachedGuests) {
     return res.status(503).json({ error: 'Guests data not available yet. Try again shortly.' });
+  }
+  const { id } = req.params;
+  if (id) {
+    // Try to find the guest by id (assuming guests are in an array and have an 'id' property)
+    const guest = Array.isArray(cachedGuests) 
+      ? cachedGuests.find(g => String(g.id) === id)
+      : null;
+    if (!guest) {
+      return res.status(404).json({ error: `Guest with id ${id} not found.` });
+    }
+    return res.json({
+      cachedAt: new Date(lastGuestsFetchTime).toISOString(),
+      data: guest
+    });
   }
   res.json({
     cachedAt: new Date(lastGuestsFetchTime).toISOString(),
