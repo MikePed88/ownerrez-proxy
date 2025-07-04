@@ -99,8 +99,8 @@ const fetchAndCacheGuests = async () => {
     const response = await axios.get('https://api.ownerrez.com/v2/guests', {
       auth: { username, password },
       params: {
-        created_since_utc: '2022-01-01T00:00:00Z'
-      }      
+        created_since_utc: "2022-01-01T00:00:00Z"
+      }
     });
     
     cachedGuests = response.data;
