@@ -90,15 +90,15 @@ app.listen(port, () => {
   console.log(`🚀 Server running on port ${port}`);
 });
 
-// Fetch Guests endpoint /guests
-// Cached Guests endpoint
+// Cached Bookings endpoint
 let cachedGuests = null;
 let lastGuestsFetchTime = null;
 
 const fetchAndCacheGuests = async () => {
   try {
     const response = await axios.get('https://api.ownerrez.com/v2/guests', {
-      auth: { username, password }
+      auth: { username, password },
+      
     });
     cachedGuests = response.data;
     lastGuestsFetchTime = Date.now();
@@ -116,31 +116,6 @@ app.get('/cached-guests', (req, res) => {
   if (!cachedGuests) {
     return res.status(503).json({ error: 'Guests data not available yet. Try again shortly.' });
   }
-  res.json({
-    cachedAt: new Date(lastGuestsFetchTime).toISOString(),
-    data: cachedGuests
-  });
-});
-
-// Optional path parameter: /cached-guests/:id?
-app.get('/cached-guests/:id?', (req, res) => {
-  if (!cachedGuests) {
-    return res.status(503).json({ error: 'Guests data not available yet. Try again shortly.' });
-  }
-  const { id } = req.params;
-  if (id) {
-    const guest = Array.isArray(cachedGuests)
-      ? cachedGuests.find(g => String(g.id) === id)
-      : null;
-    if (!guest) {
-      return res.status(404).json({ error: 'Guest not found' });
-    }
-    return res.json({
-      cachedAt: new Date(lastGuestsFetchTime).toISOString(),
-      data: guest
-    });
-  }
-  // If no id, return all guests
   res.json({
     cachedAt: new Date(lastGuestsFetchTime).toISOString(),
     data: cachedGuests
