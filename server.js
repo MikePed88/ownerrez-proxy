@@ -86,6 +86,44 @@ app.get('/cached-bookings', (req, res) => {
   });
 });
 
+// Cached Listings endpoint
+let cachedListings = null;
+let lastListingsFetchTime = null;
+
+const fetchAndCacheListings = async () => {
+  try {
+    const response = await axios.get('https://api.ownerrez.com/v2/listings', {
+      auth: { username, password },
+      params: {
+        includeAmenities: true,
+        includeRooms: true,
+        includeBathrooms: true,
+        includeImages: true,
+        includeDescriptions: Text
+      }
+    });
+    cachedListings = response.data;
+    lastListingsFetchTime = Date.now();
+    console.log('🔄 Listings cache refreshed');
+  } catch (error) {
+    console.error('❌ Failed to refresh Listings cache:', error.response?.data || error.message);
+  }
+};
+
+// Fetch once and refresh every 5 minutes
+fetchAndCacheListings();
+setInterval(fetchAndCacheListings, CACHE_DURATION_MS);
+
+app.get('/cached-listings', (req, res) => {
+  if (!cachedListings) {
+    return res.status(503).json({ error: 'Listings data not available yet. Try again shortly.' });
+  }
+  res.json({
+    cachedAt: new Date(lastListingsFetchTime).toISOString(),
+    data: cachedListings
+  });
+});
+
 // Cached Guests endpoint
 let cachedGuests = null;
 let lastGuestsFetchTime = null;
