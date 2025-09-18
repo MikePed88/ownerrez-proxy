@@ -99,7 +99,7 @@ const fetchAndCacheListings = async () => {
         includeRooms: true,
         includeBathrooms: true,
         includeImages: true,
-        includeDescriptions: Text
+        includeDescriptions: 'Text'
       }
     });
     cachedListings = response.data;
